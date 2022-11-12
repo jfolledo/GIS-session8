@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<!-- saved from url=(0030)http://127.0.0.1:51004/view/50 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>index.rst—D:\ISU\Cur\Geomatics\Session8</title>
+    <link rel="stylesheet" type="text/css" href="./index._files/github.css">
+  </head>
+  <body>
+    <div class="container">
+      <div id="markup">
+        <article id="content" class="markdown-body">
+          <div class="document">
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="http://127.0.0.1:51004/view/50#welcome-to-gis-class-session-8" id="id1">Welcome to GIS Class Session 8</a><ul>
+<li><a class="reference internal" href="http://127.0.0.1:51004/view/50#learning-outcomes" id="id2">Learning outcomes</a></li>
+<li><a class="reference internal" href="http://127.0.0.1:51004/view/50#gis-context-definition" id="id3">GIS-context definition</a></li>
+<li><a class="reference internal" href="http://127.0.0.1:51004/view/50#grass-gis-processing" id="id4">GRASS GIS processing</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="welcome-to-gis-class-session-8">
+<h1><a class="toc-backref" href="http://127.0.0.1:51004/view/50#id1">Welcome to GIS Class Session 8</a></h1>
+<p>Session 8: 05 Nov 22</p>
+<div class="section" id="learning-outcomes">
+<h2><a class="toc-backref" href="http://127.0.0.1:51004/view/50#id2">Learning outcomes</a></h2>
+<blockquote>
+<ul class="simple">
+<li>Raster to vector conversion/transformation</li>
+<li>Extract raster and vector summary statistics</li>
+<li>Raster and vector overlay operations</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="gis-context-definition">
+<h2><a class="toc-backref" href="http://127.0.0.1:51004/view/50#id3">GIS-context definition</a></h2>
+<p>1. <strong>Raster</strong> - a spatial data model that define space as
+equally-sized cells arranged in rows and columns</p>
+<div class="figure">
+<img alt="_images/raster.png" src="./index._files/RDpcSVNVXEN1clxHZW9tYXRpY3NcU2Vzc2lvbjhcX2ltYWdlc1xyYXN0ZXIucG5n">
+<p class="caption">Figure 1. Raster spatial data model (source: ESRI<sup>TM</sup>)</p>
+</div>
+<ol class="arabic simple" start="2">
+<li><strong>Vector</strong> - coordinate-based spatial data model for point, line, and polygon map layers.</li>
+</ol>
+<div class="figure">
+<img alt="_images/rastervector.png" src="./index._files/RDpcSVNVXEN1clxHZW9tYXRpY3NcU2Vzc2lvbjhcX2ltYWdlc1xyYXN0ZXJ2ZWN0b3IucG5n">
+<p class="caption">Figure 2. Raster vs vector representation of the real world</p>
+</div>
+</div>
+<div class="section" id="grass-gis-processing">
+<h2><a class="toc-backref" href="http://127.0.0.1:51004/view/50#id4">GRASS GIS processing</a></h2>
+<ol class="arabic simple">
+<li>Open GRASS database</li>
+</ol>
+<p>Run GRASS GIS. Since you have created a GRASS database
+last time, just click the <tt class="docutils literal">Start GRASS session</tt>
+button in the GRASS Startup window (see Figure 3).</p>
+<div class="figure">
+<img alt="_images/grassOpen.png" src="./index._files/RDpcSVNVXEN1clxHZW9tYXRpY3NcU2Vzc2lvbjhcX2ltYWdlc1xncmFzc09wZW4ucG5n">
+<p class="caption">Figure 3. Open GRASS GIS database</p>
+</div>
+<ol class="arabic simple" start="2">
+<li>Generate sub-watershed basin boundaries and synthetic stream</li>
+</ol>
+<p>Use trial-and-error on the threshold
+parameter to determine the appropriate watershed and stream sizes</p>
+<blockquote>
+<tt class="docutils literal">r.watershed elevation=dem8 threshold=50000 basin=rbasin stream=rstream <span class="pre">--o</span></tt></blockquote>
+<p>The outputs are rbasin for subwatershed boundaries
+while rstream for stream. The <tt class="docutils literal">r</tt> prefix means that
+the outputs are in raster format. You can display the outputs
+in QGIS or GRASS.</p>
+<ol class="arabic simple" start="3">
+<li>Convert t he synthetic river/stream into vector format</li>
+</ol>
+<ul>
+<li><p class="first">r.thin will make stream width into 1 pixel wide only in prepation for vector convertion</p>
+<blockquote>
+<p><tt class="docutils literal">r.thin <span class="pre">--o</span> input=d.stream output=stream_thin</tt></p>
+</blockquote>
+</li>
+<li><p class="first">convert from raster to vector. Display the output layer in QGIS</p>
+<blockquote>
+<p><tt class="docutils literal">r.to.vect <span class="pre">--o</span> type=line input=stream_thin output=vstream</tt></p>
+</blockquote>
+</li>
+</ul>
+<ol class="arabic" start="4">
+<li><p class="first">Get only large watersheds by enlarging the threshold=300,000</p>
+<p><tt class="docutils literal">r.watershed elevation=dem8 basin=rbasin threshold=300000 <span class="pre">--o</span></tt></p>
+</li>
+</ol>
+<ul>
+<li><p class="first">check raster statistics to the area per subwatershed</p>
+<blockquote>
+<p><tt class="docutils literal">r.stats input=rbasin <span class="pre">-an</span></tt></p>
+</blockquote>
+</li>
+<li><p class="first">convert subwatershed from raster to vector</p>
+<blockquote>
+<p><tt class="docutils literal">r.to.vect type=area input=rbasin output=vwatershed <span class="pre">--o</span> <span class="pre">-sv</span></tt></p>
+</blockquote>
+</li>
+</ul>
+<p>Display the output vwatershed in QGIS</p>
+<ul>
+<li><p class="first">reclassify raster to combine polygons belonging to the same watershed</p>
+<blockquote>
+<p><tt class="docutils literal">r.recode input=rbasin output=rbasin4 <span class="pre">rules=D:\ISU\Cur\Geomatics\Session8\rc.txt</span></tt></p>
+</blockquote>
+</li>
+</ul>
+<p>The D:ISUCurGeomaticsSession8rc.txt contains the following:</p>
+<pre class="code codehilite">2:2:1:1
+4:4:2:2
+6:6:3:3
+8:8:4:4
+12:16:5:5
+18:26:6:6
+28:32:7:7
+34:34:8:8
+36:36:9:9
+38:38:10:10
+40:40:11:11
+42:42:12:12
+</pre>
+<ul>
+<li><p class="first">convert: raster to vector</p>
+<blockquote>
+<p><tt class="docutils literal">r.to.vect type=area input=rbasin4 output=vwatershed3 <span class="pre">--o</span> <span class="pre">-sv</span></tt></p>
+</blockquote>
+</li>
+<li><p class="first">add a hectare column</p>
+<blockquote>
+<p><tt class="docutils literal">v.to.db <span class="pre">--o</span> map=vwatershed2 layer=1 type=boundary option=area columns=hectare unit=hectares</tt></p>
+</blockquote>
+</li>
+<li><p class="first">overlay the two raster layers</p>
+<blockquote>
+<p><tt class="docutils literal">r.cross input=rbasin4,rgeomorph output=crossbasmorp <span class="pre">--o</span></tt></p>
+</blockquote>
+</li>
+<li><p class="first">display the report of the overlay in hectares</p>
+<blockquote>
+<p><tt class="docutils literal">r.report map=crossbasmorp units=h</tt></p>
+</blockquote>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+        </article>
+      </div>
+    </div>
+  
+  <script type="text/x-omnimarkup-config;executed=true">
+    window.App.Context = {
+      buffer_id: 50,
+      timestamp: '1668218606.954478',
+      revivable_key: 'RDpcSVNVXEN1clxHZW9tYXRpY3NcU2Vzc2lvbjhcaW5kZXgucnN0'
+    };
+    window.App.Options = {
+      ajax_polling_interval: 500,
+      mathjax_enabled: false
+    };
+  </script>
+  <script type="text/javascript" src="./index._files/jquery-2.1.3.min.js.download"></script>
+  <script type="text/javascript" src="./index._files/imagesloaded.pkgd.min.js.download"></script>
+  <script type="text/javascript" src="./index._files/app.js.download"></script>
+
+</body></html>
